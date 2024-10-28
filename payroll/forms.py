@@ -3,7 +3,8 @@ from django import forms
 from .models import Employee, Expense, Income
 
 # test dhannon
-class EmployeeForm(forms.ModelForm): # dhannon - testing merge conflict
+class EmployeeForm(forms.ModelForm): #Testing merge conflict
+main
     class Meta:
         model = Employee
         fields = ['name', 'salary']
