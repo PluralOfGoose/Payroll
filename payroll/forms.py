@@ -3,7 +3,7 @@ from django import forms
 from .models import Employee, Expense, Income
 
 # test dhannon
-class EmployeeForm(forms.ModelForm):
+class EmployeeForm(forms.ModelForm): # dhannon - testing conflict
     class Meta:
         model = Employee
         fields = ['name', 'salary']
