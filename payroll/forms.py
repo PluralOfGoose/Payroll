@@ -2,7 +2,7 @@
 from django import forms
 from .models import Employee, Expense, Income
 
-class EmployeeForm(forms.ModelForm):
+class EmployeeForm(forms.ModelForm): #Testing merge conflict
     class Meta:
         model = Employee
         fields = ['name', 'salary']
