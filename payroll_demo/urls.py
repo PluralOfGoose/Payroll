@@ -17,11 +17,29 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from payroll import views
+from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib.auth import views as auth_views
+from oauth2_provider.views import TokenView, RevokeTokenView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = 'home'),
+    path('employees/', views.employees_list, name='employee_list'),
+    path('benefits-overview/', views.benefits_overview, name='benefits_overview'),
+    path('summary/', views.payroll_info, name='payroll_summary'),
+    path('tax-details/', views.tax_details, name='tax_details'),
     path('add_employee/', views.add_employee, name = 'add_employee'),
     path('add_expense/', views.add_expense, name = 'add_expense'),
     path('add_income/', views.add_income, name = 'add_income'),
+]
+
+urlpatterns += [
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('employees/', EmployeeListView.as_view(), name='employee_list'),
+    path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
+    path('payroll/', PayrollListView.as_view(), name='payroll_list'),
 ]

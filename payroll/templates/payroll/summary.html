@@ -1,0 +1,35 @@
+{% extends 'payroll/base_generic.html' %}
+
+{% block content %}
+    <h1>Payroll Summary</h1>
+    <p>Welcome to the payroll summary page. Below is an overview of the payroll details.</p>
+    
+    <h2>Employee Salary Overview</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Position</th>
+                <th>Salary</th>
+                <th>Bonus</th>
+                <th>Total Compensation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Add employee payroll data here dynamically using Django template logic -->
+            {% for employee in employees %}
+                <tr>
+                    <td>{{ employee.name }}</td>
+                    <td>{{ employee.position }}</td>
+                    <td>${{ employee.salary }}</td>
+                    <td>${{ employee.bonus }}</td>
+                    <td>${{ employee.total_compensation }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h2>Payroll Trends</h2>
+    <p>Here you can view trends in payroll over time, including increases, bonuses, and more.</p>
+    <!-- Insert charts, graphs, or other visual data here -->
+{% endblock %}

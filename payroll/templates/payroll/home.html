@@ -1,75 +1,68 @@
-<!-- Copyright 2024 dhannon -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll Dashboard</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            padding-top: 50px;
-        }
-        .card {
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
+{% extends "payroll/base_generic.html" %}
 
-    <div class="container">
-        <div class="row">
-            <div class="col-12 text-center">
-                <h1 class="display-4">Payroll Dashboard</h1>
-                <p class="lead">Monitor the financial health of your business</p>
-            </div>
-        </div>
+{% block title %}Home - Payroll Dashboard{% endblock %}
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-success mb-3">
-                    <div class="card-header">Profit</div>
-                    <div class="card-body">
-                        <h4 class="card-title">{{ profit }}</h4>
-                        <p class="card-text">Total profit from all transactions.</p>
-                    </div>
-                </div>
-            </div>
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to the Payroll Dashboard</h1>
+    <p class="lead">Efficiently manage employee payroll, benefits, and tax information all in one place.</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'employee_list' %}" role="button">View Employees</a>
+    <a class="btn btn-secondary btn-lg" href="{% url 'payroll_summary' %}" role="button">Payroll Summary</a>
+</div>
 
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3">
-                    <div class="card-header">Total Expenses</div>
-                    <div class="card-body">
-                        <h4 class="card-title">{{ total_expenses }}</h4>
-                        <p class="card-text">Sum of all business expenses.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-header">Total Income</div>
-                    <div class="card-body">
-                        <h4 class="card-title">{{ total_income }}</h4>
-                        <p class="card-text">Total income generated from all sources.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section to add forms or links -->
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <a href="{% url 'add_employee' %}" class="btn btn-outline-primary btn-lg">Add Employee</a>
-                <a href="{% url 'add_income' %}" class="btn btn-outline-success btn-lg">Add Income</a>
-                <a href="{% url 'add_expense' %}" class="btn btn-outline-danger btn-lg">Add Expense</a>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">Total Payroll</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_payroll }}</h5>
+                <p class="card-text">Overview of total payroll expenses for the current period.</p>
+                <a href="{% url 'payroll_summary' %}" class="btn btn-outline-success">View Details</a>
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">Tax Information</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_taxes }}</h5>
+                <p class="card-text">Summary of total taxes deducted for all employees.</p>
+                <a href="{% url 'tax_details' %}" class="btn btn-outline-info">View Tax Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-white">Benefits Summary</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ total_benefits }}</h5>
+                <p class="card-text">Overview of benefits provided to employees.</p>
+                <a href="{% url 'benefits_overview' %}" class="btn btn-outline-warning">View Benefits</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Bootstrap JS, Popper.js, and jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Employee Management</h2>
+        <p>Manage employee records, update details, and track employment history efficiently.</p>
+        <a href="{% url 'employee_list' %}" class="btn btn-primary">Manage Employees</a>
+    </div>
+    <div class="col-md-6">
+        <h2>Payroll Processing</h2>
+        <p>View, calculate, and process payroll for employees, ensuring timely and accurate payouts.</p>
+        <a href="{% url 'payroll_summary' %}" class="btn btn-primary">View Payroll</a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h2>Get Started with Payroll Tasks</h2>
+        <p class="lead">Use the quick links below to perform key payroll tasks.</p>
+        <a href="{% url 'add_employee' %}" class="btn btn-outline-primary btn-lg mr-2">Add New Employee</a>
+        <a href="{% url 'add_income' %}" class="btn btn-outline-success btn-lg mr-2">Add Income</a>
+        <a href="{% url 'add_expense' %}" class="btn btn-outline-danger btn-lg">Add Expense</a>
+    </div>
+</div>
+{% endblock %}
