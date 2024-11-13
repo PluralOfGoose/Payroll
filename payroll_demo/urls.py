@@ -21,6 +21,7 @@ from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth import views as auth_views
 from oauth2_provider.views import TokenView, RevokeTokenView
+from django.conf.urls import include
 
 
 urlpatterns = [
@@ -42,4 +43,5 @@ urlpatterns += [
     path('employees/', EmployeeListView.as_view(), name='employee_list'),
     path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
     path('payroll/', PayrollListView.as_view(), name='payroll_list'),
+    #path('auth/', include('rest_auth.urls')),
 ]

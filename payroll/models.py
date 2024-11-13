@@ -43,12 +43,17 @@ class Income(models.Model):
     def __str__(self):
         return self.source
     
-class customuser(AbstractUser):
+class CustomUser(AbstractUser, models.Model):
     ROLE_CHOICES = {
         ('manager', 'Manager'),
         ('employee', 'Employee'),
     }
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='employee')
-    email = models.EmailField(max_length=100)
+    #username = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    email = models.EmailField('email address', unique=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    def __str__(self):
+        return f"{self.email}"
 
 

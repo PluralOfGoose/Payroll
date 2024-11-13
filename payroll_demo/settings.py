@@ -34,6 +34,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'oauth2_provider',
     'rest_framework',
+    'rest_framework.authtoken',
+    #'api',
+    #'rest_auth',
     #'rest_framework_simplejwt',
     #'rest_framework_simplejwt.token_blacklist',
     'django.contrib.admin',
@@ -128,10 +131,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'payroll.CustomUser'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -144,7 +150,7 @@ OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND': 'oauth2_provider.oauth2_backends.OAuthLibCore',
 }
 
-AUTH_USER_MODEL = 'payroll.customuser'
+
 
 '''SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
