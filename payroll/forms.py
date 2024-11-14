@@ -28,8 +28,8 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = [
-            'firstName', 'lastName', 'email', 'date_of_birth', 
-            'hire_date', 'position', 'salary'
+            'firstName', 'lastName', 'email', 
+            'hire_date', 'role', 'salary'
         ]
 
 class PayrollForm(forms.ModelForm):
