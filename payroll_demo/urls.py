@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from payroll import views
-from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView
+from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView, CustomLoginView, manager_home, employee_home, profile_view
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
 from oauth2_provider.views import TokenView, RevokeTokenView
 from django.conf.urls import include
 
@@ -27,7 +28,6 @@ from django.conf.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name = 'home'),
-    path('employees/', views.employees_list, name='employee_list'),
     path('benefits-overview/', views.benefits_overview, name='benefits_overview'),
     path('summary/', views.payroll_info, name='payroll_summary'),
     path('tax-details/', views.tax_details, name='tax_details'),
@@ -37,10 +37,16 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('profile/', profile_view, name='profile'),
+    path('register/', views.register, name='register'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('manager/home/', views.manager_home, name='manager_home'),
+    path('employee/home/', views.employee_home, name='employee_home'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('employees/', EmployeeListView.as_view(), name='employee_list'),
+    path('employees/', views.employee_list, name='employee_list'),
+    path('add_employee/', views.add_employee, name='add_employee1'),
     path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
     path('payroll/', PayrollListView.as_view(), name='payroll_list'),
     #path('auth/', include('rest_auth.urls')),

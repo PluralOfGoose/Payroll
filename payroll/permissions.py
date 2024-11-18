@@ -1,6 +1,6 @@
 # permissions.py
 from rest_framework.permissions import BasePermission
-from .models import Employee, Payroll
+from .models import Employee, Payroll, CustomUser
 
 class IsManager(BasePermission):
     """
@@ -20,7 +20,10 @@ class IsEmployee(BasePermission):
     Custom permission to allow employees to view only their own payroll information.
     """
     def has_permission(self, request, view):
-        # Allow employees to view their own data
+        # Return False if the user is unauthenticated
+        if not request.user.is_authenticated:
+            return False
+        # Otherwise, check the user's role
         return request.user.role == 'employee'
 
     def has_object_permission(self, request, view, obj):

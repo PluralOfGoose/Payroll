@@ -1,8 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, Employee, Payroll, Expense, Income
 
-@admin.register(CustomUser)
+admin.site.register(CustomUser)
+admin.site.register(Employee)
+admin.site.register(Payroll)
+admin.site.register(Expense)
+admin.site.register(Income)
+
+'''@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     # Customize how the user is displayed in the admin
     fieldsets = UserAdmin.fieldsets + (
@@ -13,3 +19,4 @@ class CustomUserAdmin(UserAdmin):
     )
 
     list_display = ['email', 'username', 'first_name', 'last_name', 'role']
+'''

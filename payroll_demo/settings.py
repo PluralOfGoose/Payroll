@@ -63,7 +63,7 @@ ROOT_URLCONF = 'payroll_demo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': ['payroll/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

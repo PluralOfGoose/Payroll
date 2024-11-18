@@ -1,38 +1,24 @@
-'''# Copyright 2024 dhannon
-from django import forms
-from .models import Employee, Expense, Income
-
-# test dhannon
-class EmployeeForm(forms.ModelForm): #Testing merge conflict
-main
-    class Meta:
-        model = Employee
-        fields = ['name', 'salary']
-
-class ExpenseForm(forms.ModelForm):
-    class Meta:
-        model = Expense
-        fields = ['description', 'amount', 'date']
-
-class IncomeForm(forms.ModelForm):
-    class Meta:
-        model = Income
-        fields = ['source', 'amount', 'date']'''
-
-#copyright 2024 PluralofGoose
 # forms.py
+# Copyright 2024 dhannon & PluralofGoose
+
 from django import forms
-from .models import Employee, Payroll, Expense, Income
+from django.contrib.auth.forms import UserCreationForm
+from .models import Employee, Payroll, Expense, Income, CustomUser
+
+class CustomUserCreationForm(UserCreationForm):
+    """Form for creating a new user with additional fields."""
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'first_name', 'last_name', 'role']  # Fields for registration form
 
 class EmployeeForm(forms.ModelForm):
+    """Form for creating or updating employee records."""
     class Meta:
         model = Employee
-        fields = [
-            'firstName', 'lastName', 'email', 
-            'hire_date', 'role', 'salary'
-        ]
+        fields = ['user', 'hire_date', 'salary']  # Use 'user' to link to CustomUser, and other Employee-specific fields
 
 class PayrollForm(forms.ModelForm):
+    """Form for creating or updating payroll records."""
     class Meta:
         model = Payroll
         fields = [
@@ -42,15 +28,13 @@ class PayrollForm(forms.ModelForm):
         ]
 
 class ExpenseForm(forms.ModelForm):
+    """Form for creating or updating expense records."""
     class Meta:
         model = Expense
-        fields = [
-            'description', 'amount', 'date'
-        ]
+        fields = ['description', 'amount', 'date']
 
 class IncomeForm(forms.ModelForm):
+    """Form for creating or updating income records."""
     class Meta:
         model = Income
-        fields = [
-            'source', 'amount', 'date'
-        ]
+        fields = ['source', 'amount', 'date']

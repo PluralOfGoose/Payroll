@@ -45,16 +45,14 @@
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">Welcome, {{ user.username }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
+                    {% if user.role == 'manager' %}
+                        <a class="nav-link" href="{% url 'manager_home' %}">Welcome, {{ user.username }}</a>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'employee_home' %}">Welcome, {{ user.username }}</a>
+                    {% endif %}
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                 {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
                 {% endif %}
             </ul>
         </div>
