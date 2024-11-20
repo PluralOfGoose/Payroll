@@ -1,30 +1,17 @@
-{% extends "base_generic.html" %}
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Employee Home{% endblock %}
 
 {% block content %}
-<h1>Employee Dashboard</h1>
-<p>Welcome, {{ user.first_name }}!</p>
+<h1>Welcome, {{ user.first_name }}!</h1>
 
-<h2>My Payroll Information</h2>
-<p>Below is your current payroll information:</p>
+<div class="employee-dashboard">
+    <h3>Total Paid This Year: ${{ total_paid|floatformat:2 }}</h3>
 
-<table>
-    <tr>
-        <th>Pay Period</th>
-        <th>Amount</th>
-        <th>Status</th>
-    </tr>
-    {% for payroll in payroll_records %}
-    <tr>
-        <td>{{ payroll.pay_period }}</td>
-        <td>{{ payroll.amount }}</td>
-        <td>{{ payroll.status }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="3">No payroll records available.</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<p><a href="{% url 'payroll:update_profile' %}">Update Profile Information</a></p>
+    <h3>Next Pay Period:</h3>
+    <p>
+        Start: {{ next_pay_period_start }}<br>
+        End: {{ next_pay_period_end }}
+    </p>
+</div>
 {% endblock %}

@@ -20,9 +20,6 @@ class CustomUser(AbstractUser):
 
 class Employee(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="employee_profile")
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=200)
     hire_date = models.DateField(default=datetime.now)
     salary = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -36,7 +33,7 @@ class Employee(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
 
     def can_view_payroll(self, user):
         if user.role == "manager" or user == self.user:
@@ -57,9 +54,10 @@ class Payroll(models.Model):
     gross_pay = models.DecimalField(max_digits=10, decimal_places=2)
     taxes_withheld = models.DecimalField(max_digits=10, decimal_places=2)
     net_pay = models.DecimalField(max_digits=10, decimal_places=2)
+    #state = models.CharField(max_length=2)
 
     def __str__(self):
-        return f"Payroll for {self.employee} on {self.pay_date}"
+        return f"Payroll for {self.employee.user.first_name} {self.employee.user.last_name} on {self.pay_date}"
 
     def can_view(self, user):
         if user.role == "manager" or user == self.employee.user:

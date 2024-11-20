@@ -49,5 +49,8 @@ urlpatterns += [
     path('add_employee/', views.add_employee, name='add_employee1'),
     path('employees/<int:pk>/', EmployeeDetailView.as_view(), name='employee_detail'),
     path('payroll/', PayrollListView.as_view(), name='payroll_list'),
+    path('payroll/run/', views.run_payroll, name='run_payroll'),
+    path('employee/tax-documents/', views.tax_documents, name='tax_documents'),
+    path('create-user-ajax/', views.create_user_ajax, name='create_user_ajax'),
     #path('auth/', include('rest_auth.urls')),
 ]

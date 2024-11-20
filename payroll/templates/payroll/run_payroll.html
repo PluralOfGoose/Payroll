@@ -1,0 +1,84 @@
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Run Payroll{% endblock %}
+
+{% block content %}
+<h1>Run Payroll</h1>
+<p>Use this form to calculate and save payroll for employees.</p>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <!-- Employee Selector -->
+    <div>
+        {{ form.employee.label_tag }}
+        {{ form.employee }}
+    </div>
+
+    <!-- Hours Worked -->
+    <div>
+        {{ form.hours_worked.label_tag }}
+        {{ form.hours_worked }}
+    </div>
+
+    <!-- Date Inputs for Pay Period -->
+    <div>
+        <label for="pay_period_start">Pay Period Start:</label>
+        {{ form.pay_period_start }}
+    </div>
+
+    <div>
+        <label for="pay_period_end">Pay Period End:</label>
+        {{ form.pay_period_end }}
+    </div>
+
+    <!-- State Selector -->
+    <div>
+        <label for="state">State:</label>
+        {{ form.state }}
+    </div>
+
+    <div>
+        <h3>Payroll Calculations</h3>
+        <p>Gross Pay: $<span id="grossPay">0.00</span></p>
+        <p>Taxes Withheld: $<span id="taxesWithheld">0.00</span></p>
+        <p>Net Pay: $<span id="netPay">0.00</span></p>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Run Payroll</button>
+</form>
+
+<script>
+    document.addEventListener('input', function () {
+        // Get input values
+        const hoursWorked = parseFloat(document.querySelector('input[name="hours_worked"]').value) || 0;
+        const state = document.querySelector('select[name="state"]').value;
+        const hourlyRate = parseFloat(document.querySelector('select[name="employee"]').selectedOptions[0].dataset.hourlyRate) || 0;
+
+        // State tax rates
+        const stateTaxRates = {
+            'NY': 0.07,
+            'CA': 0.08,
+            'TX': 0.05
+        };
+
+        // Calculations
+        const grossPay = hoursWorked * hourlyRate;
+        const taxRate = stateTaxRates[state] || 0;
+        const taxesWithheld = grossPay * taxRate;
+        const netPay = grossPay - taxesWithheld;
+
+        // Update the displayed values
+        document.getElementById('grossPay').textContent = grossPay.toFixed(2);
+        document.getElementById('taxesWithheld').textContent = taxesWithheld.toFixed(2);
+        document.getElementById('netPay').textContent = netPay.toFixed(2);
+    });
+</script>
+
+<h2>Employees</h2>
+<ul>
+    {% for employee in employees %}
+        <li>{{ employee.user.first_name }} {{ employee.user.last_name }} - {{ employee.user.email }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
