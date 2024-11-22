@@ -43,6 +43,13 @@ class EmployeeForm(forms.ModelForm):
         model = Employee
         fields = ['user', 'hire_date', 'salary']  # Use 'user' to link to CustomUser, and other Employee-specific fields
 
+class EditEmployeeForm(forms.Form):
+    employee = forms.ModelChoiceField(queryset=Employee.objects.all(), required=True, label="Employee")
+    first_name = forms.CharField(max_length=100, required=False, label="First Name")
+    last_name = forms.CharField(max_length=100, required=False, label="Last Name")
+    email = forms.EmailField(max_length=200, required=False, label="Email")
+    salary = forms.DecimalField(max_digits=10, decimal_places=2, required=False, label="Salary")
+
 class PayrollForm(forms.ModelForm):
     """Form for creating or updating payroll records."""
     state = forms.ChoiceField(choices=[

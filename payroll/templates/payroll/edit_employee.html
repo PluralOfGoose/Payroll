@@ -1,0 +1,49 @@
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Edit Employee{% endblock %}
+
+{% block content %}
+<h1>Edit Employee Information</h1>
+<p>Select an employee and edit their information below. Leave fields blank if no changes are needed.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <!-- Employee Selector -->
+    <div>
+        <label for="employee">Select Employee:</label>
+        <select name="employee" id="employee" required>
+            {% for employee in employees %}
+            <option value="{{ employee.id }}">
+                {{ employee.user.first_name }} {{ employee.user.last_name }} ({{ employee.user.email }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Editable Fields -->
+    <div>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name">
+    </div>
+
+    <div>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name">
+    </div>
+
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+    </div>
+
+    <div>
+        <label for="salary">Salary:</label>
+        <input type="number" id="salary" name="salary" step="0.01">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<a href="{% url 'manager_home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+{% endblock %}

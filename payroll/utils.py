@@ -1,5 +1,8 @@
 # utils.py
 from decimal import Decimal
+from io import BytesIO
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
 
 def get_state_tax_rate(state):
     """
@@ -46,3 +49,14 @@ def calculate_payroll(hours_worked, hourly_rate, state):
         'taxes_withheld': round(taxes_withheld, 2),
         'net_pay': round(net_pay, 2),
     }
+
+def generate_pdf(template_path, context):
+    """
+    Generates a PDF from an HTML template.
+    """
+    html = render_to_string(template_path, context)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+    if pdf.err:
+        return None
+    return result.getvalue()

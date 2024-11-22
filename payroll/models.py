@@ -22,6 +22,7 @@ class Employee(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="employee_profile")
     hire_date = models.DateField(default=datetime.now)
     salary = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)  # New field to track yearly total
 
     class Meta:
         permissions = [

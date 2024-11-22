@@ -16,35 +16,40 @@ class IsManager(BasePermission):
 
 
 class IsEmployee(BasePermission):
-    """
-    Custom permission to allow employees to view only their own payroll information.
-    """
     def has_permission(self, request, view):
-        # Return False if the user is unauthenticated
         if not request.user.is_authenticated:
+            print("Authentication failed: User not authenticated")
             return False
-        # Otherwise, check the user's role
+        print(f"User authenticated: {request.user}, Role: {request.user.role}")
         return request.user.role == 'employee'
 
     def has_object_permission(self, request, view, obj):
-        # Employees can only view their own payroll information
         if isinstance(obj, Payroll):
-            return obj.employee == request.user
-        return False  # No access for non-payroll objects or if conditions are not met
-
+            return obj.employee.user == request.user
+        return False
 
 class IsEmployeeOrManager(BasePermission):
     """
-    Custom permission to allow managers and employees to view employee details.
+    Custom permission to allow employees to view their own payroll
+    and managers to view all payrolls.
     """
     def has_permission(self, request, view):
-        # Allow both managers and employees to access employee data
+        # Check if the user is authenticated
+        if not request.user.is_authenticated:
+            return False
+
+        # Allow if the user is a manager or an employee
         return request.user.role in ['manager', 'employee']
 
     def has_object_permission(self, request, view, obj):
-        # Employees can view only their own details, managers can view all details
-        if isinstance(obj, Employee):
-            return obj == request.user or request.user.role == 'manager'
+        # Managers can view any payroll instance
+        if request.user.role == 'manager':
+            return True
+
+        # Employees can only view their own payroll instance
+        if request.user.role == 'employee' and isinstance(obj, Payroll):
+            return obj.employee.user == request.user
+
         return False
 
 
@@ -53,7 +58,10 @@ class IsManagerForCreatingPayroll(BasePermission):
     Custom permission to allow only managers to create payroll entries.
     """
     def has_permission(self, request, view):
-        # Only managers can create payroll entries
+        if not request.user.is_authenticated:
+            print("Authentication failed: User not authenticated")
+            return False
+        print(f"User authenticated: {request.user}, Role: {request.user.role}")
         return request.user.role == 'manager'
 
     def has_object_permission(self, request, view, obj):

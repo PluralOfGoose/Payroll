@@ -10,10 +10,18 @@ admin.site.register(Expense)
 admin.site.register(Income)
 
 class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
     model = CustomUser
-    list_display = ['username', 'email', 'first_name', 'last_name', 'role']
+    # Ensure there is no reference to 'usable_password' in these attributes
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('role',)}),  # Include only valid fields here
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('role',)}),  # Include only valid fields here
+    )
+    list_display = ('email', 'username', 'role', 'is_staff')
+    search_fields = ('email', 'username')
 
+# Register the admin
 admin.site.register(CustomUser, CustomUserAdmin)
 
 '''@admin.register(CustomUser)

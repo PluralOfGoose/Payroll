@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+#import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -149,6 +150,16 @@ OAUTH2_PROVIDER = {
     'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
     'OAUTH2_BACKEND': 'oauth2_provider.oauth2_backends.OAuthLibCore',
 }
+
+# Use the console backend to display emails in the terminal (development only)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Optional: Production settings for SMTP (comment out during development)
+EMAIL_HOST = 'smtp.gmail.com'  # Example: Gmail's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'lendlpayroll@gmail.com'
+EMAIL_HOST_PASSWORD = 'lendlpayroll123'
 
 
 

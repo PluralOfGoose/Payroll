@@ -8,17 +8,23 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from datetime import date
 from django.utils.timezone import now
+from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from .utils import generate_pdf
 from django.core.exceptions import PermissionDenied
-from .forms import EmployeeCreationForm, ExpenseForm, IncomeForm, CustomUserCreationForm, PayrollForm
+from .forms import EmployeeCreationForm, ExpenseForm, IncomeForm, CustomUserCreationForm, PayrollForm, EditEmployeeForm
 from .models import Employee, Payroll, Expense, Income, CustomUser
 from rest_framework import status, permissions, viewsets, generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from .serializers import EmployeeSerializer, PayrollSerializer
-from .permissions import IsManager, IsEmployee
+from .permissions import IsManager, IsEmployeeOrManager, IsEmployee
 from django.contrib.auth.views import LoginView
 from .utils import get_state_tax_rate, calculate_payroll
 
@@ -111,6 +117,40 @@ def employee_list(request):
     # Pass the employee list to the template
     return render(request, 'payroll/employee_list.html', {'employees': employees})
 
+@login_required
+def edit_employee(request):
+    if request.user.role != 'manager':
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('manager_home')
+
+    if request.method == 'POST':
+        form = EditEmployeeForm(request.POST)
+        if form.is_valid():
+            # Retrieve the selected employee
+            employee = form.cleaned_data['employee']
+
+            # Update fields only if provided
+            if form.cleaned_data['first_name']:
+                employee.user.first_name = form.cleaned_data['first_name']
+            if form.cleaned_data['last_name']:
+                employee.user.last_name = form.cleaned_data['last_name']
+            if form.cleaned_data['email']:
+                employee.user.email = form.cleaned_data['email']
+            if form.cleaned_data['salary']:
+                employee.salary = form.cleaned_data['salary']
+
+            # Save changes
+            employee.user.save()
+            employee.save()
+
+            messages.success(request, "Employee information updated successfully.")
+            return redirect('edit_employee')
+    else:
+        form = EditEmployeeForm()
+
+    # Fetch all employees for the dropdown
+    employees = Employee.objects.all()
+    return render(request, 'payroll/edit_employee.html', {'form': form, 'employees': employees})
 
 def payroll_info(request):
     payrolls = Payroll.objects.all()
@@ -213,18 +253,35 @@ class EmployeeDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsManager]
 
 
-class PayrollListView(LoginRequiredMixin, generics.ListAPIView):
+class PayrollListView(generics.ListAPIView):
     serializer_class = PayrollSerializer
-    permission_classes = [IsEmployee]
+    permission_classes = [IsAuthenticated, IsEmployeeOrManager]
 
     def get_queryset(self):
-        # Filter payroll records based on the user's role
         user = self.request.user
         if user.role == 'manager':
-            return Payroll.objects.all()  # Managers can view all payrolls
+            # Managers can view all payrolls
+            return Payroll.objects.all()
         else:
-            return Payroll.objects.filter(employee__user=user)  # Employees can view only their payrolls
+            # Employees can only view their own payrolls
+            return Payroll.objects.filter(employee__user=user)
         
+@login_required
+def payroll_list(request):
+    user = request.user
+
+    # Fetch payroll data based on the user's role
+    if user.role == 'manager':
+        payrolls = Payroll.objects.all()  # Managers see all payrolls
+    else:
+        payrolls = Payroll.objects.filter(employee__user=user)  # Employees see their own payrolls
+
+    # Pass payroll data to the template
+    context = {
+        'payrolls': payrolls,
+    }
+    return render(request, 'payroll/payroll_list.html', context)
+
 from .utils import calculate_payroll
 
 @login_required
@@ -252,18 +309,45 @@ def run_payroll(request):
             payroll.taxes_withheld = payroll_data['taxes_withheld']
             payroll.net_pay = payroll_data['net_pay']
             payroll.pay_date = date.today()  # Default pay date to today
+
+            # Debugging
+            print(f"Net Pay: {payroll.net_pay}, Current Total: {employee.total}")
             
+            # Update employee total
+            employee.total += payroll.net_pay
+            print(f"Updated Total: {employee.total}")
+
+            # Save the employee record
+            employee.save()
+
+            # Save the payroll record
             payroll.pay_period_start = form.cleaned_data['pay_period_start']
             payroll.pay_period_end = form.cleaned_data['pay_period_end']
-            
             payroll.save()
 
-            return redirect('payroll_list')  # Redirect to payroll list page after saving
+            # Generate pay stub PDF
+            context = {
+                'employee': employee,
+                'payroll': payroll,
+                'state': state,
+            }
+            pdf = generate_pdf('payroll/pay_stub.html', context)
+
+            if pdf:
+                # Send email with pay stub attached
+                subject = f"Pay Stub for {payroll.pay_date}"
+                message = render_to_string('payroll/pay_stub_email.html', context)
+                email = EmailMessage(subject, message, to=[employee.user.email])
+                email.attach(f"PayStub_{payroll.pay_date}.pdf", pdf, 'application/pdf')
+                email.send()
+
+            return redirect('payroll_list')  # Redirect to payroll list page
     else:
         form = PayrollForm()
 
     employees = Employee.objects.all()  # Fetch all employees
     return render(request, 'payroll/run_payroll.html', {'form': form, 'employees': employees})
+
 
 @login_required
 def tax_documents(request):
