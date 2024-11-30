@@ -6,63 +6,73 @@
 <div class="jumbotron text-center">
     <h1 class="display-4">Welcome to the Payroll Dashboard</h1>
     <p class="lead">Efficiently manage employee payroll, benefits, and tax information all in one place.</p>
-    <a class="btn btn-primary btn-lg" href="{% url 'employee_list' %}" role="button">View Employees</a>
-    <a class="btn btn-secondary btn-lg" href="{% url 'payroll_summary' %}" role="button">Payroll Summary</a>
+    
+    {% if user.is_authenticated and user.role == 'manager' %}
+        <a class="btn btn-primary btn-lg" href="{% url 'employee_list' %}" role="button">View Employees</a>
+        <a class="btn btn-secondary btn-lg" href="{% url 'payroll_list' %}" role="button">Payroll Summary</a>
+        <a class="btn btn-success btn-lg" href="{% url 'manager_home' %}" role="button">Manager Home</a>
+    {% elif user.is_authenticated and user.role == 'employee' %}
+        <a class="btn btn-success btn-lg" href="{% url 'employee_home' %}" role="button">Employee Home</a>
+    {% else %}
+        <a class="btn btn-warning btn-lg" href="{% url 'login' %}" role="button">Login</a>
+    {% endif %}
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">Total Payroll</div>
-            <div class="card-body">
-                <h5 class="card-title">{{ total_payroll }}</h5>
-                <p class="card-text">Overview of total payroll expenses for the current period.</p>
-                <a href="{% url 'payroll_summary' %}" class="btn btn-outline-success">View Details</a>
+{% if user.is_authenticated and user.role == 'manager' %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">Total Payroll</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_payroll }}</h5>
+                    <p class="card-text">Overview of total payroll expenses for the current period.</p>
+                    <a href="{% url 'payroll_list' %}" class="btn btn-outline-success">View Details</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">Tax Information</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_taxes }}</h5>
+                    <p class="card-text">Summary of total taxes deducted for all employees.</p>
+                    <a href="{% url 'tax_details' %}" class="btn btn-outline-info">View Tax Details</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">Benefits Summary</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_benefits }}</h5>
+                    <p class="card-text">Overview of benefits provided to employees.</p>
+                    <a href="{% url 'benefits_overview' %}" class="btn btn-outline-warning">View Benefits</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white">Tax Information</div>
-            <div class="card-body">
-                <h5 class="card-title">{{ total_taxes }}</h5>
-                <p class="card-text">Summary of total taxes deducted for all employees.</p>
-                <a href="{% url 'tax_details' %}" class="btn btn-outline-info">View Tax Details</a>
-            </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Employee Management</h2>
+            <p>Manage employee records, update details, and track employment history efficiently.</p>
+            <a href="{% url 'employee_list' %}" class="btn btn-primary">Manage Employees</a>
+        </div>
+        <div class="col-md-6">
+            <h2>Payroll Processing</h2>
+            <p>View, calculate, and process payroll for employees, ensuring timely and accurate payouts.</p>
+            <a href="{% url 'run_payroll' %}" class="btn btn-primary">View Payroll</a>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-warning text-white">Benefits Summary</div>
-            <div class="card-body">
-                <h5 class="card-title">{{ total_benefits }}</h5>
-                <p class="card-text">Overview of benefits provided to employees.</p>
-                <a href="{% url 'benefits_overview' %}" class="btn btn-outline-warning">View Benefits</a>
-            </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12 text-center">
+            <h2>Get Started with Payroll Tasks</h2>
+            <p class="lead">Use the quick links below to perform key payroll tasks.</p>
+            <a href="{% url 'add_employee' %}" class="btn btn-outline-primary btn-lg mr-2">Add New Employee</a>
+            <a href="{% url 'add_income' %}" class="btn btn-outline-success btn-lg mr-2">Add Income</a>
+            <a href="{% url 'add_expense' %}" class="btn btn-outline-danger btn-lg">Add Expense</a>
         </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6">
-        <h2>Employee Management</h2>
-        <p>Manage employee records, update details, and track employment history efficiently.</p>
-        <a href="{% url 'employee_list' %}" class="btn btn-primary">Manage Employees</a>
-    </div>
-    <div class="col-md-6">
-        <h2>Payroll Processing</h2>
-        <p>View, calculate, and process payroll for employees, ensuring timely and accurate payouts.</p>
-        <a href="{% url 'payroll_summary' %}" class="btn btn-primary">View Payroll</a>
-    </div>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-12 text-center">
-        <h2>Get Started with Payroll Tasks</h2>
-        <p class="lead">Use the quick links below to perform key payroll tasks.</p>
-        <a href="{% url 'add_employee' %}" class="btn btn-outline-primary btn-lg mr-2">Add New Employee</a>
-        <a href="{% url 'add_income' %}" class="btn btn-outline-success btn-lg mr-2">Add Income</a>
-        <a href="{% url 'add_expense' %}" class="btn btn-outline-danger btn-lg">Add Expense</a>
-    </div>
-</div>
+{% endif %}
 {% endblock %}
