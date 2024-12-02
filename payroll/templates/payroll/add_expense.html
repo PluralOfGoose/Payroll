@@ -12,4 +12,22 @@
     </form>
     <a href="{% url 'home' %}" class="btn btn-link mt-3">Back to Dashboard</a>
 </div>
+<div id="app">
+    {% verbatim %}
+    <p>{{ message }}</p>
+    {% endverbatim %}
+</div>
+<!--<script src="https://cdn.jsdelivr.net/npm/vue@3"></script>-->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const app = Vue.createApp({
+            data() {
+                return { message: "Hello, Vue!" };
+            },
+        });
+        app.mount('#app');
+    });
+</script>
+
 {% endblock %}

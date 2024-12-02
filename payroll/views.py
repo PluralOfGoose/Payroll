@@ -27,6 +27,10 @@ from .serializers import EmployeeSerializer, PayrollSerializer
 from .permissions import IsManager, IsEmployeeOrManager, IsEmployee
 from django.contrib.auth.views import LoginView
 from .utils import get_state_tax_rate, calculate_payroll
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from io import BytesIO
 
 
 class CustomLoginView(LoginView):
@@ -284,6 +288,11 @@ def payroll_list(request):
 
 from .utils import calculate_payroll
 
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from io import BytesIO
+
 @login_required
 def run_payroll(request):
     if request.user.role != 'manager':  # Ensure user is a manager
@@ -294,58 +303,52 @@ def run_payroll(request):
         if form.is_valid():
             payroll = form.save(commit=False)
 
+            # Extract necessary data
             state = form.cleaned_data['state']
-
-            # Get data from form or POST request
             employee = payroll.employee
             hours_worked = payroll.hours_worked
             hourly_rate = payroll.employee.salary / 2080  # Assuming 2080 work hours/year
             
-            # Use the `calculate_payroll` function to compute payroll
+            # Calculate payroll
             payroll_data = calculate_payroll(hours_worked, hourly_rate, state)
-
-            # Save calculated payroll details to the payroll object
             payroll.gross_pay = payroll_data['gross_pay']
             payroll.taxes_withheld = payroll_data['taxes_withheld']
             payroll.net_pay = payroll_data['net_pay']
             payroll.pay_date = date.today()  # Default pay date to today
 
-            # Debugging
-            print(f"Net Pay: {payroll.net_pay}, Current Total: {employee.total}")
-            
-            # Update employee total
+            # Update employee's total
             employee.total += payroll.net_pay
-            print(f"Updated Total: {employee.total}")
-
-            # Save the employee record
             employee.save()
 
-            # Save the payroll record
+            # Save payroll record
             payroll.pay_period_start = form.cleaned_data['pay_period_start']
             payroll.pay_period_end = form.cleaned_data['pay_period_end']
             payroll.save()
 
-            # Generate pay stub PDF
+            # Generate Paystub
             context = {
                 'employee': employee,
                 'payroll': payroll,
                 'state': state,
             }
-            pdf = generate_pdf('payroll/pay_stub.html', context)
+            html_content = render_to_string('payroll/pay_stub.html', context)
+            pdf_file = BytesIO()
+            HTML(string=html_content).write_pdf(pdf_file)
+            pdf_file.seek(0)
 
-            if pdf:
-                # Send email with pay stub attached
-                subject = f"Pay Stub for {payroll.pay_date}"
-                message = render_to_string('payroll/pay_stub_email.html', context)
-                email = EmailMessage(subject, message, to=[employee.user.email])
-                email.attach(f"PayStub_{payroll.pay_date}.pdf", pdf, 'application/pdf')
-                email.send()
+            # Send Email
+            subject = f"Pay Stub for {payroll.pay_date}"
+            message = render_to_string('payroll/pay_stub_email.html', context)
+            from_email = 'lendlpayroll@zohomail.com'
+            email = EmailMessage(subject, message, from_email, to=[employee.user.email])
+            email.attach(f"PayStub_{payroll.pay_date}.pdf", pdf_file.read(), 'application/pdf')
+            email.send()
 
-            return redirect('payroll_list')  # Redirect to payroll list page
+            return redirect('payroll_list')
     else:
         form = PayrollForm()
 
-    employees = Employee.objects.all()  # Fetch all employees
+    employees = Employee.objects.all()
     return render(request, 'payroll/run_payroll.html', {'form': form, 'employees': employees})
 
 

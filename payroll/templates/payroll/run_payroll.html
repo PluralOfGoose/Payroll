@@ -50,10 +50,24 @@
 
 <script>
     document.addEventListener('input', function () {
-        // Get input values
-        const hoursWorked = parseFloat(document.querySelector('input[name="hours_worked"]').value) || 0;
-        const state = document.querySelector('select[name="state"]').value;
-        const hourlyRate = parseFloat(document.querySelector('select[name="employee"]').selectedOptions[0].dataset.hourlyRate) || 0;
+        // Fetch input values
+        const employeeSelect = document.querySelector('select[name="employee"]');
+        const hoursWorkedInput = document.querySelector('input[name="hours_worked"]');
+        const stateSelect = document.querySelector('select[name="state"]');
+        const grossPaySpan = document.getElementById('grossPay');
+        const taxesWithheldSpan = document.getElementById('taxesWithheld');
+        const netPaySpan = document.getElementById('netPay');
+
+        // Ensure necessary fields are available
+        if (!employeeSelect || !hoursWorkedInput || !stateSelect) {
+            console.warn("Missing required input elements for payroll calculations.");
+            return;
+        }
+
+        const hoursWorked = parseFloat(hoursWorkedInput.value) || 0;
+        const selectedEmployee = employeeSelect.selectedOptions[0];
+        const hourlyRate = selectedEmployee ? parseFloat(selectedEmployee.dataset.hourlyRate) || 0 : 0;
+        const state = stateSelect.value;
 
         // State tax rates
         const stateTaxRates = {
@@ -62,16 +76,16 @@
             'TX': 0.05
         };
 
-        // Calculations
+        // Payroll calculations
         const grossPay = hoursWorked * hourlyRate;
         const taxRate = stateTaxRates[state] || 0;
         const taxesWithheld = grossPay * taxRate;
         const netPay = grossPay - taxesWithheld;
 
-        // Update the displayed values
-        document.getElementById('grossPay').textContent = grossPay.toFixed(2);
-        document.getElementById('taxesWithheld').textContent = taxesWithheld.toFixed(2);
-        document.getElementById('netPay').textContent = netPay.toFixed(2);
+        // Update calculated values on the page
+        grossPaySpan.textContent = grossPay.toFixed(2);
+        taxesWithheldSpan.textContent = taxesWithheld.toFixed(2);
+        netPaySpan.textContent = netPay.toFixed(2);
     });
 </script>
 

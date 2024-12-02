@@ -17,6 +17,7 @@
             <th>Taxes Withheld</th>
             <th>Net Pay</th>
             <th>Employee</th>
+            <th>Total</th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,7 @@
             <td>{{ payroll.taxes_withheld }}</td>
             <td>{{ payroll.net_pay }}</td>
             <td>{{ payroll.employee.user.first_name }} {{ payroll.employee.user.last_name }}</td>
+            <td>{{ payroll.employee.total }}</td>
         </tr>
         {% empty %}
         <tr>

@@ -151,15 +151,23 @@ OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND': 'oauth2_provider.oauth2_backends.OAuthLibCore',
 }
 
-# Use the console backend to display emails in the terminal (development only)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Development Email Backend (Console)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Optional: Production settings for SMTP (comment out during development)
-EMAIL_HOST = 'smtp.gmail.com'  # Example: Gmail's SMTP server
+EMAIL_HOST = 'smtp.zoho.com'  # Example: Gmail's SMTP server
+#EMAIL_USE_TLS = False
+#EMAIL_USE_SSL = True
+#EMAIL_PORT = 465
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'lendlpayroll@gmail.com'
-EMAIL_HOST_PASSWORD = 'lendlpayroll123'
+EMAIL_HOST_USER = 'lendlpayroll@zohomail.com'
+EMAIL_HOST_PASSWORD = 'garnetdevs123'
+DEFULT_FROM_EMAIL = 'lendlpayroll@zohomail.com'
+#Email password = lendlpayroll1234
+#Email app password 1 = dnft keez hheq tcgp
+#email password 3 = uewv tikv ghrm bjez
+#Zoho email = lendlpayroll@zohomail.com
 
 
 
