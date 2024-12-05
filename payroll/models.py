@@ -53,12 +53,16 @@ class Payroll(models.Model):
     pay_period_end = models.DateField()
     hours_worked = models.DecimalField(max_digits=5, decimal_places=2)
     gross_pay = models.DecimalField(max_digits=10, decimal_places=2)
-    taxes_withheld = models.DecimalField(max_digits=10, decimal_places=2)
+    taxes_withheld = models.DecimalField(max_digits=10, decimal_places=2)  # Legacy field for total taxes
+    federal_tax_withheld = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    state_tax_withheld = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    social_security = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    medicare = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     net_pay = models.DecimalField(max_digits=10, decimal_places=2)
-    #state = models.CharField(max_length=2)
 
     def __str__(self):
-        return f"Payroll for {self.employee.user.first_name} {self.employee.user.last_name} on {self.pay_date}"
+        return f"Payroll for {self.employee.user.get_full_name()} on {self.pay_date}"
+
 
     def can_view(self, user):
         if user.role == "manager" or user == self.employee.user:
@@ -85,3 +89,18 @@ class Income(models.Model):
 
     def __str__(self):
         return self.source
+    
+class W2(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    year = models.IntegerField()
+    wages = models.DecimalField(max_digits=10, decimal_places=2)
+    federal_tax_withheld = models.DecimalField(max_digits=10, decimal_places=2)
+    state_tax_withheld = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    social_security_wages = models.DecimalField(max_digits=10, decimal_places=2)
+    medicare_wages = models.DecimalField(max_digits=10, decimal_places=2)
+    employer_name = models.CharField(max_length=255)
+    employer_ein = models.CharField(max_length=9)  # Employer Identification Number
+    employer_address = models.TextField()
+
+    def __str__(self):
+        return f"W-2 for {self.employee} ({self.year})"

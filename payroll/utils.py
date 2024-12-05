@@ -1,6 +1,8 @@
 # utils.py
 from decimal import Decimal
 from io import BytesIO
+import os
+from weasyprint import HTML
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 
@@ -22,7 +24,7 @@ def get_state_tax_rate(state):
 
 def calculate_payroll(hours_worked, hourly_rate, state):
     """
-    Calculates the gross pay, taxes withheld, and net pay for an employee.
+    Calculates the gross pay, net pay, medicare and social security taxes withheld for an employee.
     
     Args:
         hours_worked (float): Number of hours worked by the employee.
@@ -41,13 +43,25 @@ def calculate_payroll(hours_worked, hourly_rate, state):
 
     tax_rate = get_state_tax_rate(state)
     tax_rate = Decimal(tax_rate)
-    taxes_withheld = gross_pay * tax_rate
-    net_pay = gross_pay - taxes_withheld
+    medicare_tax_rate = Decimal(0.0145)
+    social_security_tax_rate = Decimal(0.062)
+    state_taxes_withheld = gross_pay * tax_rate
+    medicare_taxes = gross_pay * medicare_tax_rate
+    social_security_taxes = gross_pay * social_security_tax_rate
+    net_pay = gross_pay - (state_taxes_withheld + medicare_taxes + social_security_taxes)
+    taxes_withheld = state_taxes_withheld + medicare_taxes + social_security_taxes
+
+    # Debugging
+    print(f"Gross Pay: {gross_pay}, State Tax: {state_taxes_withheld}, "
+          f"Medicare: {medicare_taxes}, Social Security: {social_security_taxes}, Net Pay: {net_pay}")
 
     return {
         'gross_pay': round(gross_pay, 2),
-        'taxes_withheld': round(taxes_withheld, 2),
+        'state_taxes_withheld': round(state_taxes_withheld, 2),
+        'medicare_taxes': round(medicare_taxes, 2),
+        'social_security_taxes': round(social_security_taxes, 2),
         'net_pay': round(net_pay, 2),
+        'taxes_withheld': round(taxes_withheld, 2),
     }
 
 def generate_pdf(template_path, context):
@@ -60,3 +74,16 @@ def generate_pdf(template_path, context):
     if pdf.err:
         return None
     return result.getvalue()
+
+def generate_w2_pdf(w2):
+    # Render the W-2 template with the W-2 data
+    context = {
+        'w2': w2,
+    }
+    html_string = render_to_string('payroll/w2_template.html', context)
+
+    # Generate the PDF
+    pdf_file_path = f'w2s/W2_{w2.year}_{w2.employee.id}.pdf'
+    os.makedirs(os.path.dirname(pdf_file_path), exist_ok=True)
+    HTML(string=html_string).write_pdf(pdf_file_path)
+    return pdf_file_path

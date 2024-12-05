@@ -9,15 +9,16 @@ from django.views.generic import ListView
 from datetime import date
 from django.utils.timezone import now
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Sum
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from .utils import generate_pdf
+from .utils import generate_pdf, calculate_payroll
 from django.core.exceptions import PermissionDenied
+from . import models
 from .forms import EmployeeCreationForm, ExpenseForm, IncomeForm, CustomUserCreationForm, PayrollForm, EditEmployeeForm
-from .models import Employee, Payroll, Expense, Income, CustomUser
+from .models import Employee, Payroll, Expense, Income, CustomUser, W2
 from rest_framework import status, permissions, viewsets, generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -303,54 +304,43 @@ def run_payroll(request):
         if form.is_valid():
             payroll = form.save(commit=False)
 
-            # Extract necessary data
+            # Extract data from the form
             state = form.cleaned_data['state']
             employee = payroll.employee
             hours_worked = payroll.hours_worked
-            hourly_rate = payroll.employee.salary / 2080  # Assuming 2080 work hours/year
-            
-            # Calculate payroll
+            hourly_rate = employee.salary / 2080  # Calculate hourly rate
+
+            # Use the calculate_payroll function
             payroll_data = calculate_payroll(hours_worked, hourly_rate, state)
+
+            # Assign calculated values to payroll instance
             payroll.gross_pay = payroll_data['gross_pay']
-            payroll.taxes_withheld = payroll_data['taxes_withheld']
+            payroll.state_tax_withheld = payroll_data['state_taxes_withheld']
+            payroll.medicare = payroll_data['medicare_taxes']
+            payroll.social_security = payroll_data['social_security_taxes']
             payroll.net_pay = payroll_data['net_pay']
-            payroll.pay_date = date.today()  # Default pay date to today
+            payroll.taxes_withheld = payroll_data['taxes_withheld']
 
-            # Update employee's total
-            employee.total += payroll.net_pay
-            employee.save()
-
-            # Save payroll record
+            # Save the payroll instance
             payroll.pay_period_start = form.cleaned_data['pay_period_start']
             payroll.pay_period_end = form.cleaned_data['pay_period_end']
+            payroll.pay_date = date.today()  # Default to today
             payroll.save()
 
-            # Generate Paystub
-            context = {
-                'employee': employee,
-                'payroll': payroll,
-                'state': state,
-            }
-            html_content = render_to_string('payroll/pay_stub.html', context)
-            pdf_file = BytesIO()
-            HTML(string=html_content).write_pdf(pdf_file)
-            pdf_file.seek(0)
+            # Update the employee's total earnings
+            employee.total += payroll.gross_pay
+            employee.save()
 
-            # Send Email
-            subject = f"Pay Stub for {payroll.pay_date}"
-            message = render_to_string('payroll/pay_stub_email.html', context)
-            from_email = 'lendlpayroll@zohomail.com'
-            email = EmailMessage(subject, message, from_email, to=[employee.user.email])
-            email.attach(f"PayStub_{payroll.pay_date}.pdf", pdf_file.read(), 'application/pdf')
-            email.send()
+            return redirect('payroll_list')  # Redirect to payroll list page
 
-            return redirect('payroll_list')
     else:
         form = PayrollForm()
 
     employees = Employee.objects.all()
     return render(request, 'payroll/run_payroll.html', {'form': form, 'employees': employees})
 
+def event_listen(request):
+    return render(request, 'payroll/event_listener.html')
 
 @login_required
 def tax_documents(request):
@@ -361,3 +351,55 @@ def tax_documents(request):
     tax_documents = []  # Replace with actual logic to retrieve tax documents
 
     return render(request, 'payroll/tax_documents.html', {'tax_documents': tax_documents})
+
+@login_required
+def generate_w2(request):
+    # Ensure only managers can access
+    if request.user.role != 'manager':
+        return HttpResponse("Unauthorized", status=403)
+
+    year = request.GET.get('year', None)
+    employee_id = request.GET.get('employee_id', None)
+
+    # Fetch employees and filter Payroll records
+    employees = Employee.objects.all()
+    payrolls = Payroll.objects.filter(pay_date__year=year, employee_id=employee_id) if year and employee_id else []
+
+    if request.method == 'POST' and year and employee_id:
+        # Aggregate W-2 data
+        total_earnings = sum(payroll.gross_pay for payroll in payrolls)
+        #total_federal_tax = payrolls.aggregate(total=models.Sum('state_tax_withheld'))['total'] or 15
+        total_state_tax = payrolls.aggregate(total=Sum('state_tax_withheld'))['total'] or 15
+        total_social_security = payrolls.aggregate(total=Sum('social_security'))['total'] or 18
+        total_medicare = payrolls.aggregate(total=Sum('medicare'))['total'] or 20
+
+        # Get employee
+        employee = Employee.objects.get(pk=employee_id)
+
+        # Render W-2 template
+        context = {
+            'employee': employee,
+            'year': year,
+            'total_earnings': total_earnings,
+            #'federal_tax': total_federal_tax,
+            'state_tax': total_state_tax,
+            'social_security': total_social_security,
+            'medicare': total_medicare,
+        }
+        html = render_to_string('payroll/w2_template.html', context)
+
+        # Generate PDF
+        pdf = generate_pdf('payroll/w2_template.html', context)
+
+        # Return PDF response
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="W2_{employee.user.get_full_name()}_{year}.pdf"'
+        return response
+
+    context = {
+        'employees': employees,
+        'payrolls': payrolls,
+        'year': year,
+        'selected_employee': employee_id,
+    }
+    return render(request, 'payroll/generate_w2.html', context)

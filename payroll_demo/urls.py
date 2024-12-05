@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from payroll import views
-from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView, CustomLoginView, manager_home, employee_home, profile_view
+from payroll.views import EmployeeDetailView, EmployeeListView, PayrollListView, CustomLoginView, manager_home, employee_home, profile_view, event_listen
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
@@ -53,5 +53,7 @@ urlpatterns += [
     path('employee/tax-documents/', views.tax_documents, name='tax_documents'),
     path('create-user-ajax/', views.create_user_ajax, name='create_user_ajax'),
     path('edit_employee/', views.edit_employee, name='edit_employee'),
+    path('payroll/generate_w2/', views.generate_w2, name='generate_w2'),
+    path('eventlistener/',views.event_listen, name='event_listen')
     #path('auth/', include('rest_auth.urls')),
 ]

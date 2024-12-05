@@ -68,29 +68,29 @@ class PayrollForm(forms.ModelForm):
         widgets = {
             'pay_period_start': forms.DateInput(attrs={'type': 'date'}),
             'pay_period_end': forms.DateInput(attrs={'type': 'date'}),
+            #'hours_worked': forms.NumberInput(attrs={'id': 'hours_worked'}),
         }
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['employee'].widget = Select(
+            choices=[
+                (e.id, mark_safe(f'{e.user.first_name} {e.user.last_name} (Rate: ${e.salary / 2080:.2f}/hr)'))
+                for e in Employee.objects.all()
+            ],
+            attrs={
+                'data-hourly-rate': lambda employee: employee.salary / 2080 
+            }
+        )
 
-            self.fields['employee'].widget = Select(
-                choices=[
-                    (e.id, mark_safe(f'{e.user.first_name} {e.user.last_name} (Rate: ${e.salary / 2080:.2f})'))
-                    for e in Employee.objects.all()
-                ],
-                attrs={
-                    'data-hourly-rate': lambda employee: employee.salary / 2080 
-                }
-            )
+    def clean(self):
+        cleaned_data = super().clean()
+        pay_period_start = cleaned_data.get('pay_period_start')
+        pay_period_end = cleaned_data.get('pay_period_end')
 
-        def clean(self):
-            cleaned_data = super().clean()
-            pay_period_start = cleaned_data.get('pay_period_start')
-            pay_period_end = cleaned_data.get('pay_period_end')
-
-            if pay_period_start and pay_period_end:
-                if pay_period_start > pay_period_end:
-                    raise ValidationError("Pay period start date mest be before pay period end date")
+        if pay_period_start and pay_period_end:
+            if pay_period_start > pay_period_end:
+                raise ValidationError("Pay period start date must be before pay period end date")
 
 class ExpenseForm(forms.ModelForm):
     """Form for creating or updating expense records."""

@@ -85,8 +85,12 @@ WSGI_APPLICATION = 'payroll_demo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'payroll_db',
+        'USER': 'brown',
+        'PASSWORD': 'willpassword123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -168,6 +172,7 @@ DEFULT_FROM_EMAIL = 'lendlpayroll@zohomail.com'
 #Email app password 1 = dnft keez hheq tcgp
 #email password 3 = uewv tikv ghrm bjez
 #Zoho email = lendlpayroll@zohomail.com
+#postgres password = 102893Wb
 
 
 

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>W-2 for {{ year }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>W-2 for {{ employee.user.get_full_name }}</h1>
+    <p><strong>Year:</strong> {{ year }}</p>
+    <p><strong>Total Earnings:</strong> ${{ total_earnings }}</p>
+    <!--<p><strong>Federal Tax Withheld:</strong> ${{ federal_tax }}</p>-->
+    <p><strong>State Tax Withheld:</strong> ${{ state_tax }}</p>
+    <p><strong>Social Security Wages:</strong> ${{ social_security }}</p>
+    <p><strong>Medicare Wages:</strong> ${{ medicare }}</p>
+</body>
+</html>

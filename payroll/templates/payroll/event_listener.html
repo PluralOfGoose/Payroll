@@ -1,0 +1,33 @@
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Event Listener Example{% endblock %}
+
+{% block content %}
+
+<head>
+    <title>Real-time Calculator</title>
+    </head>
+    <body>
+    <div id="num1">
+      <input type="number" placeholder="Number 1">
+    </div>
+      <input type="number" id="num2" placeholder="Number 2">
+      <p>Result: <span id="result"></span></p>
+    
+      <script>
+        const num1Input = document.querySelector("#num1 input");
+        const num2Input = document.getElementById("num2");
+        const resultSpan = document.getElementById("result");
+    
+        function calculate() {
+          const num1 = parseFloat(num1Input.value) || 0;
+          const num2 = parseFloat(num2Input.value) || 0;
+          resultSpan.textContent = num1 + num2;
+        }
+    
+        num1Input.addEventListener("input", calculate);
+        num2Input.addEventListener("input", calculate);
+      </script>
+    </body>
+
+{% endblock %}
