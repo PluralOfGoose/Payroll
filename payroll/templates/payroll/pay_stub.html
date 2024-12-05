@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Pay Stub</h1>
+    <h2>{{ employee.user.first_name }} {{ employee.user.last_name }}</h2>
+    <p>Email: {{ employee.user.email }}</p>
+    <p>Pay Date: {{ payroll.pay_date }}</p>
+    <p>Pay Period: {{ payroll.pay_period_start }} - {{ payroll.pay_period_end }}</p>
+
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+        </tr>
+        <tr>
+            <td>Gross Pay</td>
+            <td>${{ payroll.gross_pay|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Taxes Withheld</td>
+            <td>${{ payroll.taxes_withheld|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <td>Net Pay</td>
+            <td>${{ payroll.net_pay|floatformat:2 }}</td>
+        </tr>
+    </table>
+</body>
+</html>

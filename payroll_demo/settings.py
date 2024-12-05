@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+#import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +33,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'oauth2_provider',
+    'rest_framework',
+    'rest_framework.authtoken',
+    #'api',
+    #'rest_auth',
+    #'rest_framework_simplejwt',
+    #'rest_framework_simplejwt.token_blacklist',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,7 +64,7 @@ ROOT_URLCONF = 'payroll_demo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': ['payroll/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,8 +85,12 @@ WSGI_APPLICATION = 'payroll_demo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'payroll_db',
+        'USER': 'brown',
+        'PASSWORD': 'willpassword123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -122,3 +135,54 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'payroll.CustomUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.AllowAny',
+    ],
+}
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
+    'OAUTH2_BACKEND': 'oauth2_provider.oauth2_backends.OAuthLibCore',
+}
+
+# Development Email Backend (Console)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Optional: Production settings for SMTP (comment out during development)
+EMAIL_HOST = 'smtp.zoho.com'  # Example: Gmail's SMTP server
+#EMAIL_USE_TLS = False
+#EMAIL_USE_SSL = True
+#EMAIL_PORT = 465
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'lendlpayroll@zohomail.com'
+EMAIL_HOST_PASSWORD = 'garnetdevs123'
+DEFULT_FROM_EMAIL = 'lendlpayroll@zohomail.com'
+#Email password = lendlpayroll1234
+#Email app password 1 = dnft keez hheq tcgp
+#email password 3 = uewv tikv ghrm bjez
+#Zoho email = lendlpayroll@zohomail.com
+#postgres password = 102893Wb
+
+
+
+'''SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}'''
+

@@ -1,0 +1,60 @@
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Generate W-2 Documents{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Generate W-2 Documents</h1>
+    <form method="get">
+        <div class="form-group">
+            <label for="year">Year</label>
+            <input type="number" name="year" id="year" class="form-control" value="{{ year }}" required>
+        </div>
+        <div class="form-group">
+            <label for="employee">Employee</label>
+            <select name="employee_id" id="employee" class="form-control">
+                <option value="">-- Select Employee --</option>
+                {% for employee in employees %}
+                <option value="{{ employee.id }}" {% if employee.id|stringformat:"s" == selected_employee %}selected{% endif %}>
+                    {{ employee.user.get_full_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">View W-2</button>
+    </form>
+    {% if payrolls %}
+    <h2>Payroll Data for {{ year }}</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pay Date</th>
+                <th>Gross Pay</th>
+                <!--<th>Federal Tax</th>-->
+                <th>State Tax</th>
+                <th>Social Security</th>
+                <th>Medicare</th>
+                <th>Net Pay</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payroll in payrolls %}
+            <tr>
+                <td>{{ payroll.pay_date }}</td>
+                <td>${{ payroll.gross_pay }}</td>
+                <!--<td>${{ payroll.federal_tax_withheld }}</td>-->
+                <td>${{ payroll.state_tax_withheld }}</td>
+                <td>${{ payroll.social_security }}</td>
+                <td>${{ payroll.medicare }}</td>
+                <td>${{ payroll.net_pay }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Generate W-2 PDF</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

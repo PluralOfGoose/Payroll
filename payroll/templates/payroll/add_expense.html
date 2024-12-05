@@ -1,21 +1,33 @@
-<!-- Copyright 2024 dhannon -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Expense</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container">
-        <h1 class="mt-5">Add Expense</h1>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-danger">Save Expense</button>
-        </form>
-        <a href="{% url 'home' %}" class="btn btn-link mt-3">Back to Dashboard</a>
-    </div>
-</body>
-</html>
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Add Expense{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Add Expense</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-danger">Save Expense</button>
+    </form>
+    <a href="{% url 'home' %}" class="btn btn-link mt-3">Back to Dashboard</a>
+</div>
+<div id="app">
+    {% verbatim %}
+    <p>{{ message }}</p>
+    {% endverbatim %}
+</div>
+<!--<script src="https://cdn.jsdelivr.net/npm/vue@3"></script>-->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const app = Vue.createApp({
+            data() {
+                return { message: "Hello, Vue!" };
+            },
+        });
+        app.mount('#app');
+    });
+</script>
+
+{% endblock %}
