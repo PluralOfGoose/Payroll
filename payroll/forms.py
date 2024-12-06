@@ -103,3 +103,10 @@ class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
         fields = ['source', 'amount', 'date']
+
+class CustomUserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'first_name', 'last_name', 'role', 'password']

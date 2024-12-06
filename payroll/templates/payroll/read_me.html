@@ -1,0 +1,75 @@
+{% extends 'payroll/base_generic.html' %}
+
+{% block content %}
+
+<p>
+    You can find the specific requirement fulfillments below:
+</p>
+<ul>
+    <li><strong>1.1 Login/Logout:</strong> Located in the top right corner or center page on the Payroll System tab.</li>
+    <li><strong>1.2 Navigation Menu:</strong> Located at the top of the screen or as a dropdown in the hamburger button.</li>
+    <li><strong>1.3 User Accessibility:</strong> All located on the manager home page, under "Home" in the navigation menu.</li>
+    <li><strong>1.4 Payroll Report Generation:</strong> Generated after running payroll (under "Run Payroll" on the manager home page), sent to employee email on file.</li>
+    <li><strong>1.5 PostgreSQL databasing (from settings.py):</strong>
+        <pre>
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': 'payroll_db',
+                    'USER': 'brown',
+                    'PASSWORD': 'willpassword123',
+                    'HOST': 'localhost',
+                    'PORT': '5432',
+                }
+            }
+        </pre>
+    </li>
+    <li><strong>1.6 W2 Payroll:</strong> Located under "Generate W2 Documents" on the manager home page, sent to employee email on file.</li>
+</ul>
+
+<p><strong>2.1 Role-based Access Control:</strong></p>
+<ul>
+    <li><strong>Employee Login:</strong>
+        <ul>
+            <li>Email: <code>noemail2@gmail.com</code></li>
+            <li>Password: <code>password</code></li>
+        </ul>
+    </li>
+    <li><strong>Manager Login:</strong>
+        <ul>
+            <li>Email: <code>noemail@gmail.com</code></li>
+            <li>Password: <code>password</code></li>
+        </ul>
+    </li>
+</ul>
+
+<p><strong>APIs Used:</strong></p>
+<ul>
+    <li><strong>Django:</strong> Entire project.</li>
+    <li><strong>Oauth2 and JWT:</strong> Role-based access control and settings in <code>settings.py</code>:
+        <pre>
+        REST_FRAMEWORK = {
+            'DEFAULT_AUTHENTICATION_CLASSES': [
+                'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+                'rest_framework_simplejwt.authentication.JWTAuthentication',
+            ],
+            'DEFAULT_PERMISSION_CLASSES': [
+                'rest_framework.permissions.IsAuthenticated',
+            ],
+        }
+        </pre>
+    </li>
+    <li><strong>PostgreSQL:</strong> Settings in <code>settings.py</code>:
+        <pre>
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+    }
+}
+        </pre>
+    </li>
+    <li><strong>Stripe:</strong> See <code>stripe_payment.html</code></li>
+    <li><strong>Vue:</strong> Search through the payroll list (see <code>payroll_list.html</code>).</li>
+</ul>
+
+{% endblock %}

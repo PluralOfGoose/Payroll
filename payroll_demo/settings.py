@@ -174,6 +174,9 @@ DEFULT_FROM_EMAIL = 'lendlpayroll@zohomail.com'
 #Zoho email = lendlpayroll@zohomail.com
 #postgres password = 102893Wb
 
+STRIPE_PUBLIC_KEY = 'pk_test_51QT2nnI3JX2FYvXB4RY9LumB3Zf7k3whPuJfbIE2uvWHAjQkY7NzSPEVdaqZq7QZd3bN0WnF2w0hqCEdk5zk2QyS00qkmb01SD'
+STRIPE_SECRET_KEY = 'sk_test_51QT2nnI3JX2FYvXBUfPMlF5eYuk0FltuXMyCZRR6gPsK9MZ0ZEVaQ6IaZHLTqrsLzJ0CFibhmui2squ0YJzthRQ400KdFPGluu'
+
 
 
 '''SIMPLE_JWT = {

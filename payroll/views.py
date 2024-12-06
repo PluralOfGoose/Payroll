@@ -342,6 +342,9 @@ def run_payroll(request):
 def event_listen(request):
     return render(request, 'payroll/event_listener.html')
 
+def read_me(request):
+    return render(request, 'payroll/read_me.html')
+
 @login_required
 def tax_documents(request):
     if request.user.role != 'employee':
@@ -403,3 +406,65 @@ def generate_w2(request):
         'selected_employee': employee_id,
     }
     return render(request, 'payroll/generate_w2.html', context)
+
+from rest_framework.permissions import AllowAny
+
+class PayrollListAPI(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
+    queryset = Payroll.objects.all()  # List all payroll records
+    serializer_class = PayrollSerializer  # Use the PayrollSerializer for serialization
+
+import stripe
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def create_payment_intent(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            amount = data.get('amount')  # Amount in cents
+            currency = 'usd'  # Default currency
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=currency,
+                metadata={'integration_check': 'accept_a_payment'}
+            )
+            return JsonResponse({'clientSecret': intent['client_secret']})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        
+@csrf_exempt
+def stripe_payment_view(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    # Create a PaymentIntent
+    intent = stripe.PaymentIntent.create(
+        amount=5000,  # Amount in cents ($50.00)
+        currency='usd',
+        payment_method_types=['card'],
+    )
+
+    return render(request, 'payroll/stripe_payment.html', {
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
+        'client_secret': intent.client_secret,
+    })
+    
+    #return redirect('home')
+
+from django.contrib.auth import login
+from .forms import CustomUserCreationForm, CustomUserRegistrationForm
+#from .forms import UserRegistrationForm
+
+def register(request):
+    if request.method == 'POST':
+        form = CustomUserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Log the user in after successful registration
+            login(request, user)
+            return redirect('home')  # Replace 'home' with the name of the page to redirect to after registration
+    else:
+        form = CustomUserRegistrationForm()
+
+    return render(request, 'payroll/register.html', {'form': form})

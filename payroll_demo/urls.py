@@ -54,6 +54,11 @@ urlpatterns += [
     path('create-user-ajax/', views.create_user_ajax, name='create_user_ajax'),
     path('edit_employee/', views.edit_employee, name='edit_employee'),
     path('payroll/generate_w2/', views.generate_w2, name='generate_w2'),
-    path('eventlistener/',views.event_listen, name='event_listen')
+    path('eventlistener/',views.event_listen, name='event_listen'),
     #path('auth/', include('rest_auth.urls')),
+    path('api/payrolls/', views.PayrollListAPI.as_view(), name='payroll-list-api'),
+    path('create-payment-intent/', views.create_payment_intent, name='create-payment-intent'),
+    path('stripe/payment/', views.stripe_payment_view, name='stripe-payment'),
+    path('read/me', views.read_me, name='read_me'),
+    path('register/', views.register, name='register'),
 ]

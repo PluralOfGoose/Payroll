@@ -3,42 +3,62 @@
 {% block title %}Payroll List{% endblock %}
 
 {% block content %}
-<h1>Payroll List</h1>
+<div id="vueApp">
+  <h1>Payroll List</h1>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Pay Date</th>
-            <th>Pay Period Start</th>
-            <th>Pay Period End</th>
-            <th>Hours Worked</th>
-            <th>Gross Pay</th>
-            <th>Taxes Withheld</th>
-            <th>Net Pay</th>
-            <th>Employee</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for payroll in payrolls %}
-        <tr>
-            <td>{{ payroll.id }}</td>
-            <td>{{ payroll.pay_date }}</td>
-            <td>{{ payroll.pay_period_start }}</td>
-            <td>{{ payroll.pay_period_end }}</td>
-            <td>{{ payroll.hours_worked }}</td>
-            <td>{{ payroll.gross_pay }}</td>
-            <td>{{ payroll.taxes_withheld }}</td>
-            <td>{{ payroll.net_pay }}</td>
-            <td>{{ payroll.employee.user.first_name }} {{ payroll.employee.user.last_name }}</td>
-            <td>{{ payroll.employee.total }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="9">No payroll records found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+  <p v-if="payrolls.length === 0">Loading payroll data...</p>
+
+  <div v-else>
+    <!-- Search Input -->
+    <input v-model="searchTerm" placeholder="Search by employee name..." />
+
+    <!-- Filtered Payroll List -->
+    <ul>
+      <li v-for="payroll in filteredPayrolls" :key="payroll.id">
+        <strong>{% verbatim %}{{ payroll.employee_name }}</strong> - Gross Pay: {{ payroll.gross_pay }} - Hours Worked: {{ payroll.hours_worked}}{% endverbatim %}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Include Vue 3 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+
+<script>
+  const vueApp = Vue.createApp({
+    data() {
+      return {
+        searchTerm: '', // For user input in search bar
+        payrolls: [] // List of payrolls fetched from the API
+      };
+    },
+    computed: {
+      // Filter payrolls based on search term
+      filteredPayrolls() {
+        return this.payrolls.filter(payroll =>
+          payroll.employee_name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+      }
+    },
+    methods: {
+      // Fetch payroll data from the API
+      async loadData() {
+        try {
+          const response = await fetch('/api/payrolls');
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          this.payrolls = await response.json();
+        } catch (error) {
+          console.error("Error fetching payroll data:", error);
+        }
+      }
+    },
+    mounted() {
+      this.loadData(); // Load data when the app is mounted
+    }
+  });
+
+  vueApp.mount('#vueApp'); // Mount Vue app to the DOM
+</script>
 {% endblock %}

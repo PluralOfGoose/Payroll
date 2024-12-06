@@ -1,0 +1,15 @@
+<!-- templates/registration/register.html -->
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}User Registration{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2>Create a New Account</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}  <!-- Display form fields as paragraphs -->
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </div>
+{% endblock %}

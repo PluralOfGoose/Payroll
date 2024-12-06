@@ -1,0 +1,38 @@
+{% extends "payroll/base_generic.html" %}
+
+{% block title %}Stripe Payment{% endblock %}
+
+{% block content %}
+<h2>Enter Card Information</h2>
+<p>(Use test card 4242 4242 4242 4242, Exp. 12/34, CVV 123 ZIP 12345</p>
+<div id="card-element"></div>
+<p>Pay Using the button below</p>
+<button id="submit">Pay</button>
+<div id="card-errors" role="alert"></div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+  const elements = stripe.elements();
+  const card = elements.create('card');
+  card.mount('#card-element');
+
+  document.querySelector('#submit').addEventListener('click', async () => {
+    const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card,
+        billing_details: {
+          name: 'Test User'
+        }
+      }
+    });
+
+    if (error) {
+      console.error(error.message);
+      document.querySelector('#card-errors').textContent = error.message;
+    } else if (paymentIntent.status === 'succeeded') {
+      alert('Payment successful!');
+    }
+  });
+</script>
+{% endblock %}
