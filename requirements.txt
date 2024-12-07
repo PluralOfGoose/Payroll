@@ -19,6 +19,9 @@ djangorestframework-simplejwt==5.2.2
 # Payment processing with Stripe
 stripe==5.0.0
 
+# Oauth
+django-oauth-toolkit==3.0.0
+
 # PDF generation
 weasyprint==63.0
 
