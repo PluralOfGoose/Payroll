@@ -1,0 +1,34 @@
+# Core dependencies
+Django==5.1.2
+gunicorn==21.2.0
+whitenoise==6.4.0
+
+# PostgreSQL database adapter
+psycopg2-binary==2.9.8
+
+# Environment variables management
+python-decouple==3.8
+
+# REST framework and CORS
+djangorestframework==3.14.0
+django-cors-headers==4.0.0
+
+# JWT-based authentication
+djangorestframework-simplejwt==5.2.2
+
+# Payment processing with Stripe
+stripe==5.0.0
+
+# PDF generation
+weasyprint==57.3
+
+# Linter and development tools
+black==23.9.1
+flake8==6.1.0
+isort==5.12.0
+
+# Static analysis
+mypy==1.5.1
+
+# Specify your Python version if needed
+# python==3.11
